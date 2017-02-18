@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hangman Game</title>
+	<!-- Linking CSS -->
+	<link rel="stylesheet" type="text/css" href="assets/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/gamestyle.css">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	
+</head>
+
+<body>
+  <div class="heading">
+    <div>
+      <h4> Competitive Hangman </h4>
+    </div>
+    <div>
+      <h3> Guess the word before your chances run out</h3>
+    </div>
+  </div>
+	
+	<div class="after-box"></div>
+		
+	<div id="game-info">
+		<div id = "no-of-players" class="games_players_info">	</div>
+		<div id = "no-of-turns" class="games_players_info">	</div>
+		<div id ="no-of-guesses" class="games_players_info"> </div>
+	</div>
+	
+	<div class="after-box"></div>
+	<div id="word-in-play"></div>
+	
+
+	<div id="letters-guessed">  </div>
+				
+	<div id="play-area">
+		<div id="player1" class="hide-player">	
+			<div class="player-data">
+				<h3 class="player-name"> Name Place Holder </h3> 
+				<hr>
+				<p class="player-status"> Waiting my turn </p>
+				<br>
+				<p class="player-wins"> Wins = </p>
+				<br>
+        <br>
+				<p class="my-current-word-guess">  </p>
+				<br>
+				<p class=""> Guesses Remaining </p>
+				<p class="guesses-remaining">
+				<br>
+			</div>
+		</div>	
+		
+		<div id="player2" class="hide-player">	
+			<div class="player-data">
+				<h3 class="player-name"> Name Place Holder </h3> 
+				<hr>
+				<p class="player-status"> Waiting my turn </p>
+				<br>
+				<p class="player-wins"> Wins = </p>
+				<br>
+        <br>
+				<p class="my-current-word-guess">  </p>
+				<br>
+				<p class="">Guesses Remaining </p>
+				<p class="guesses-remaining">
+				<br>
+			</div>
+		</div>	
+		
+		<div id="player3" class="hide-player">	
+			<div class="player-data">
+				<h3 class="player-name"> Name Place Holder </h3> 
+				<hr>
+				<p class="player-status"> Waiting my turn </p>
+				<br>
+				<p class="player-wins"> Wins = </p>
+				<br>
+        <br>
+				<p class="my-current-word-guess">  </p>
+				<br>
+				<p class=""> Guesses Remaining </p>
+				<p class="guesses-remaining">
+				<br>
+			</div>
+		</div>	
+		
+		<div id="player4" class="hide-player">	
+			<div class="player-data">
+				<h3 class="player-name"> Name Place Holder </h3> 
+				<hr>
+				<p class="player-status"> Waiting my turn </p>
+				<br>
+				<p class="player-wins"> Wins = </p>
+				<br>
+        <br>
+				<p class="my-current-word-guess">  </p>
+				<br>
+				<p class=""> Guesses Remaining </p>
+				<p class="guesses-remaining"> </p>
+				<br>
+			</div>
+		</div>	
+		</div>
+		<div class="after-box"></div>
+		<hr class="">
+
+
+	</div>
+		
+		<script>
+		
+		  var playerStatusActive = 'Playing';
+			var playerStatusStart = 'Press any Key to Begin';
+			var playerStatusWaiting = 'Waiting My Turn';
+			var currentPlayer = 0;
+			var playerGuessCount = 0;			
+			var playerNames = [];
+			var guessedLetters =[];
+			var currentWord = '';
+			var currentWordMasked = '';
+			var playerTurns =0;
+			var playerGuessesPerTurns;
+      var playerWins = [0,0,0,0];
+					
+		  function welcomeScreen()
+				{
+				var playerCount = prompt('How Many Players; Maximum 4');
+					
+				if (Number(playerCount) =='NaN')
+          {
+          playerCount = 1;
+          document.getElementById('no-of-players').innerHTML = "Defaulting Players = "+playerCount;
+					}
+        else
+          {
+          document.getElementById('no-of-players').innerHTML = "Players = "+playerCount;
+          }
+          
+				for (var i=0; i < playerCount; i++)
+					{
+					playerNames.push(prompt('Please Enter player '+(i+1)+' Name')); 
+					}
+					
+				playerTurns = prompt('How Many Turns Each');
+        if (Number(playerTurns) == 'NaN')
+          {
+          playerTurns = 2;
+          document.getElementById('no-of-turns').innerHTML = "Defaulting Turns = "+playerTurns; 
+          }
+        else
+          {
+          document.getElementById('no-of-turns').innerHTML = "Turns = "+playerTurns;         
+          }
+				playerGuessesPerTurns = prompt('How Many Guesses per Turns');
+        if(Number(playerGuessesPerTurns)=='NaN')
+          {
+          playerGuessesPerTurns = 4;
+          document.getElementById('no-of-guesses').innerHTML = "Defaultion Guesses Each Turn = "+playerGuessesPerTurns;
+          }
+        else
+          {
+          document.getElementById('no-of-guesses').innerHTML = "Guesses Each Turn = "+playerGuessesPerTurns;
+          }
+				for (var i=1; i<=playerCount; i++)
+					{
+					$('#player'+i).removeClass('hide-player');	
+					}
+				}
+				
+			function displayPlayers()
+				{
+				for (var i=0; i < playerNames.length; i++)
+					{
+					var wins = document.getElementsByClassName('player-name');
+					wins[i].innerHTML = playerNames[i];
+					}
+				}
+				
+			function displayNewWord()
+				{
+					var wins = document.getElementById('word-in-play');
+					console.log(wins.innerHTML);
+					wins.innerHTML = currentWordMasked;
+				}	
+				
+				function RandomWordComplete(data) 
+					{
+					var dummy = [];
+					currentWord = data.Word.toLowerCase();
+					currentWordMasked = '';
+					guessedLetters = dummy;
+					for (var i=0; i< currentWord.length; i++)
+						{
+						guessedLetters[i] = '-';
+						currentWordMasked = currentWordMasked +'- ';
+						}
+					displayNewWord();
+				}		
+      			
+			  function RandomWord() 
+					{
+					var len = Math.floor(playerGuessesPerTurns /1.5);
+					var requestStr = "http://randomword.setgetgo.com/get.php?len="+len;
+
+					$.ajax({
+									type: "GET",
+									url: requestStr,
+									dataType: "jsonp",
+									jsonpCallback: 'RandomWordComplete'
+									}   
+								 );
+					}
+			
+			
+			
+			function switchPlayer(currentPlayerID)
+				{
+				// remover current player id 
+				if (currentPlayerID == (playerNames.length - 1)) 
+					{
+					currentPlayer = 0;
+					}
+				else
+					{
+					currentPlayer++;
+					}	
+					RandomWord();			
+				}
+
+				function updatePlayerWins(currentPlayerID)
+					{
+					
+					var wins = document.getElementsByClassName('player-wins');
+					wins[currentPlayerID].innerHTML = 'Wins = '+ (++playerWins[currentPlayerID]);
+					}
+
+					
+				function displaySelectedCharacters()
+					{
+						var displayWordGuess = '';
+						for(var i=0; i< guessedLetters.length; i++)
+							{
+							displayWordGuess = displayWordGuess + guessedLetters[i];
+							}
+							
+							var wins = document.getElementById('word-in-play');
+							wins.innerHTML = displayWordGuess;
+					}
+ 	
+			function checkForWinner()
+				{
+				for(var letter=0; letter < guessedLetters.length; letter++)
+					{
+					if (guessedLetters[letter] == '-')
+						{
+						return false;
+						}
+					}	
+					return true;
+				}
+				
+			function resetLetterGuesses()
+				{
+				var guesses = document.getElementById('letters-guessed');
+				guesses.innerHTML = 'Letters Guessed ';
+				}
+
+				function updateLetterGuesses(newGuess)
+				{
+				var guesses = document.getElementById('letters-guessed');
+				var updatedGueses = guesses.innerHTML + ' '+ newGuess;
+				guesses.innerHTML = updatedGueses;
+				}
+		
+			function updateWordWithKeyPressed(playerKeyPressed)
+				{
+					var keyFound = false;
+					for(var i=0; i<currentWord.length; i++)
+						{
+						if(playerKeyPressed == currentWord.charAt(i))
+							{
+							guessedLetters[i] = playerKeyPressed;
+							keyFound = true;
+							}
+						}
+					if (!keyFound)
+						{
+						updateLetterGuesses(playerKeyPressed);
+						}
+					else
+						{
+						displaySelectedCharacters();
+						}
+				}
+			function updateGuessesRemaining(currentPlayerID,guessesRemaining)
+				{
+				var wins = document.getElementsByClassName("guesses-remaining");
+				wins[currentPlayerID].innerHTML = guessesRemaining;
+				}			
+			
+			function activePlayer(currentPlayerID, keyPressed)
+				{
+        var winner = false;
+         
+					
+				function displayPlayerStatus(playerStatus)
+					{					
+					var wins = document.getElementsByClassName("player-status");
+					wins[currentPlayerID].innerHTML = playerStatus;
+					if(playerStatus == playerStatusActive)
+						{
+						$('#player'+currentPlayerID).addClass('current-player');	
+						}
+					}
+					
+					// display word
+					displayPlayerStatus(playerStatusActive);
+					
+						
+						// update Remaining guesses counter-increment	
+						updateGuessesRemaining(currentPlayerID,playerGuessesPerTurns-playerGuessCount);
+						updateWordWithKeyPressed(keyPressed);
+						
+						
+						// Check if word identified
+						winner = checkForWinner();
+						
+						if (winner) 
+							{
+								updatePlayerWins(currentPlayerID);
+							}
+							
+						if((playerGuessesPerTurns-playerGuessCount <1) || (winner)) 
+							{
+							updateGuessesRemaining(currentPlayerID,0);
+							$('#player'+currentPlayerID).removeClass('current-player');
+							displayPlayerStatus(playerStatusWaiting);
+						  switchPlayer(currentPlayerID);
+							playerGuessCount=0;
+							resetLetterGuesses();
+							$('#player'+currentPlayerID).addClass('current-player');	
+							displayNewWord();
+							action=null;
+							}
+				}
+				
+
+			function playGame()
+				{
+				document.onkeyup = function(keyEvent)
+					{
+						activePlayer(currentPlayer, keyEvent.key);
+						playerGuessCount++;
+					}		
+				}
+				
+			welcomeScreen();
+			RandomWord()
+			displayPlayers();
+			displayNewWord();
+			playerGuessCount++
+			playGame();
+			
+		</script>
+		
+</body>
+
+</html>
